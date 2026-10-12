@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="夜之城"><meta name="theme-color" content="#07070d">
+<title>NIGHT CITY // 连接中</title>
+<style>
+body{margin:0;background:#07070d;color:#e8f6ff;font:15px/1.6 ui-monospace,Menlo,Consolas,"PingFang SC",monospace;display:flex;min-height:100vh;align-items:center;justify-content:center}
+.box{width:min(520px,92vw);border:1px solid #fcee0a55;padding:28px;box-shadow:0 0 30px #fcee0a22}
+h1{margin:0 0 6px;font-size:18px;color:#fcee0a;letter-spacing:2px}
+p{color:#9fb3c8;font-size:13px;margin:6px 0 16px}
+label{display:block;font-size:12px;color:#5ef2ff;margin:12px 0 4px}
+input{width:100%;box-sizing:border-box;background:#0f0f1a;border:1px solid #333;color:#fff;padding:9px;font:inherit}
+button{margin-top:18px;background:#fcee0a;color:#000;border:0;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
+#msg{margin-top:14px;font-size:13px;color:#ff5ea0;white-space:pre-wrap}
+</style></head><body>
+<div class="box" id="ui"><h1>NIGHT CITY // UPLINK</h1><p id="status">正在从 GitHub 拉取最新终端…</p></div>
+<script>
+const CFG_KEY='nc2077.hub', CACHE_KEY='nc2077.hub.cache';
+const DEFAULT_REPO='zhai66666-max/life-os-2077', PATH='terminal/night-city-terminal.html';
+const ui=document.getElementById('ui');
+const getCfg=()=>{try{return JSON.parse(localStorage.getItem(CFG_KEY))||{}}catch(e){return{}}};
+const dec=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,'')),c=>c.charCodeAt(0)));
+
+function boot(html,hub){
+  const inject='<script>window.__NC_HUB='+JSON.stringify(hub).replace(/</g,'\\u003c')+';<\/script>';
+  html=html.replace(/<head([^>]*)>/i,m=>m+inject);
+  document.open();document.write(html);document.close();
+}
+function form(err){
+  const c=getCfg();
+  ui.innerHTML=`<h1>NIGHT CITY // UPLINK</h1>
+  <p>第一次在这台设备使用：填入对 life-os-2077 有 Contents: Read and write 权限的 GitHub 令牌（和终端云同步用同一个）。令牌只保存在这台设备的浏览器里；用完公共设备记得在终端里点「退出此设备」。</p>
+  <label>仓库</label><input id="repo" value="${c.repo||DEFAULT_REPO}">
+  <label>读写令牌（github_pat_…）</label><input id="tok" type="password" value="${c.token||''}">
+  <button id="go">连接</button><div id="msg">${err||''}</div>`;
+  document.getElementById('go').onclick=()=>{
+    localStorage.setItem(CFG_KEY,JSON.stringify({repo:document.getElementById('repo').value.trim(),token:document.getElementById('tok').value.trim()}));
+    location.reload();
+  };
+}
+(async()=>{
+  const c=getCfg();
+  if(!c.token){form();return;}
+  try{
+    const r=await fetch(`https://api.github.com/repos/${c.repo}/contents/${PATH}?t=${Date.now()}`,{headers:{Authorization:'Bearer '+c.token,Accept:'application/vnd.github+json'},cache:'no-store'});
+    if(r.status===401||r.status===403||r.status===404){form('连接失败（'+r.status+'）：令牌无效、过期，或没有这个仓库的读取权限。');return;}
+    if(!r.ok) throw new Error(r.status);
+    const j=await r.json(); const html=dec(j.content);
+    try{localStorage.setItem(CACHE_KEY,JSON.stringify({sha:j.sha,html}))}catch(e){}
+    boot(html,{repo:c.repo,token:c.token,sha:j.sha});
+  }catch(e){
+    let cache=null;try{cache=JSON.parse(localStorage.getItem(CACHE_KEY))}catch(_){}
+    if(cache&&cache.html){boot(cache.html,{repo:c.repo,token:c.token,sha:cache.sha,offline:true});}
+    else document.getElementById('status').textContent='网络不通，且本地还没有缓存版本。联网后刷新。';
+  }
+})();
+</script></body></html>

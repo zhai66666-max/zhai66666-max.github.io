@@ -39,13 +39,16 @@ function form(err){
 (async()=>{
   const c=getCfg();
   if(!c.token){form();return;}
+  let cc=null;try{cc=JSON.parse(localStorage.getItem(CACHE_KEY))}catch(_){}
   try{
-    const r=await fetch(`https://api.github.com/repos/${c.repo}/contents/${PATH}?t=${Date.now()}`,{headers:{Authorization:'Bearer '+c.token,Accept:'application/vnd.github+json'},cache:'no-store'});
+    const hd={Authorization:'Bearer '+c.token,Accept:'application/vnd.github+json'};if(cc&&cc.etag&&cc.html)hd['If-None-Match']=cc.etag;
+    const r=await fetch(`https://api.github.com/repos/${c.repo}/contents/${PATH}`,{headers:hd,cache:'no-store'});
+    if(r.status===304&&cc&&cc.html){boot(cc.html,{repo:c.repo,token:c.token,sha:cc.sha,etag:cc.etag});return;}
     if(r.status===401||r.status===403||r.status===404){form('连接失败（'+r.status+'）：令牌无效、过期，或没有这个仓库的读取权限。');return;}
     if(!r.ok) throw new Error(r.status);
-    const j=await r.json(); const html=dec(j.content);
-    try{localStorage.setItem(CACHE_KEY,JSON.stringify({sha:j.sha,html}))}catch(e){}
-    boot(html,{repo:c.repo,token:c.token,sha:j.sha});
+    const j=await r.json(); const html=dec(j.content); const et=r.headers.get('ETag')||'';
+    try{localStorage.setItem(CACHE_KEY,JSON.stringify({sha:j.sha,html,etag:et}))}catch(e){}
+    boot(html,{repo:c.repo,token:c.token,sha:j.sha,etag:et});
   }catch(e){
     let cache=null;try{cache=JSON.parse(localStorage.getItem(CACHE_KEY))}catch(_){}
     if(cache&&cache.html){boot(cache.html,{repo:c.repo,token:c.token,sha:cache.sha,offline:true});}

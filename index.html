@@ -47,7 +47,14 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
     const ac=new AbortController();const to=setTimeout(()=>ac.abort(),cc&&cc.html?6000:20000);
     const r=await fetch(`https://api.github.com/repos/${c.repo}/contents/${PATH}`,{headers:hd,cache:'no-store',signal:ac.signal});clearTimeout(to);
     if(r.status===304&&cc&&cc.html){boot(cc.html,{repo:c.repo,token:c.token,sha:cc.sha,etag:cc.etag});return;}
-    if(r.status===401||r.status===403||r.status===404){form('连接失败（'+r.status+'）：令牌无效、过期，或没有这个仓库的读取权限。');return;}
+    if(r.status===401||r.status===403||r.status===404){let gm='';try{gm=(await r.json()).message||''}catch(_){}
+      const rl=r.headers.get('x-ratelimit-remaining')==='0'||/rate limit/i.test(gm);
+      if(rl){const rs=+r.headers.get('x-ratelimit-reset')||0;const at=rs?new Date(rs*1000).toLocaleTimeString().slice(0,5):'一小时内';
+        if(cc&&cc.html){boot(cc.html,{repo:c.repo,token:c.token,sha:cc.sha,offline:true});return;}
+        form('GitHub 接口暂时限流（不是令牌坏了），'+at+' 自动恢复，到时刷新即可。');return;}
+      const why=r.status===401?'令牌无效或已过期，需要在 GitHub 重新生成一个':(r.status===404?'找不到仓库，或令牌没有勾选这个仓库':'令牌没有这个仓库的 Contents 权限，或已被撤销');
+      form('连接失败（'+r.status+'）：'+why+'。GitHub 原话：'+(gm||'无')+(cc&&cc.html?'<br><button id="useCache" style="margin-top:8px">先用本机缓存打开</button>':''));
+      const uc=document.getElementById('useCache');if(uc)uc.onclick=()=>boot(cc.html,{repo:c.repo,token:c.token,sha:cc.sha,offline:true});return;}
     if(!r.ok) throw new Error(r.status);
     const j=await r.json(); const html=dec(j.content); const et=r.headers.get('ETag')||'';
     try{localStorage.setItem(CACHE_KEY,JSON.stringify({sha:j.sha,html,etag:et}))}catch(e){}

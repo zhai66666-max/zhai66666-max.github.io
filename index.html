@@ -2,20 +2,45 @@
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="夜之城"><meta name="theme-color" content="#07070d">
 <title>NIGHT CITY // 连接中</title>
 <style>
-body{margin:0;background:#07070d;color:#e8f6ff;font:15px/1.6 ui-monospace,Menlo,Consolas,"PingFang SC",monospace;display:flex;min-height:100vh;align-items:center;justify-content:center}
-.box{width:min(520px,92vw);border:1px solid #fcee0a55;padding:28px;box-shadow:0 0 30px #fcee0a22}
-h1{margin:0 0 6px;font-size:18px;color:#fcee0a;letter-spacing:2px}
+:root{--y:#fcee0a;--c:#5ef2ff;--r:#ff4d6d;--t:#e8f6ff;--d:#8a98ab}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--t);
+ font:15px/1.65 "JetBrains Mono",ui-monospace,Menlo,Consolas,"PingFang SC","Microsoft YaHei",monospace;
+ background:radial-gradient(ellipse at 50% 35%,#16152a 0,#07070d 65%) fixed,#07070d}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 3px)}
+.box{position:relative;width:min(540px,92vw);padding:30px 30px 22px;background:#0b0b14e6;border:1px solid #fcee0a33;
+ clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 0 40px #fcee0a14 inset}
+.box:after{content:"";position:absolute;left:0;top:0;width:4px;height:100%;background:linear-gradient(var(--y),#fcee0a00)}
+h1{margin:0;font-size:20px;color:var(--y);letter-spacing:3px;font-weight:800;text-shadow:0 0 12px #fcee0a55}
+h1 small{font-size:11px;letter-spacing:1px;color:#0b0b14;background:var(--c);padding:1px 6px;margin-left:8px;vertical-align:3px;font-weight:700;text-shadow:none}
+.sub{margin:4px 0 20px;font-size:11px;letter-spacing:2px;color:#5ef2ff99}
+#status{font-size:14px;color:var(--t);min-height:44px}
+#status:before{content:"▸ ";color:var(--c)}
+.bar{height:3px;background:#ffffff10;margin:16px 0 10px;overflow:hidden;position:relative}
+.bar i{position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,var(--c),var(--y));animation:run 1.2s linear infinite}
+@keyframes run{to{left:100%}}
+.box.err .bar i{animation:none;left:0;width:100%;background:var(--r)}
+.box.err{border-color:#ff4d6d55}.box.err:after{background:linear-gradient(var(--r),#ff4d6d00)}
+.box.err #status:before{content:"✕ ";color:var(--r)}
+.et{font-weight:700;color:#ff8fa3;font-size:15px}
+.ed{display:block;margin-top:6px;color:var(--d);font-size:12px;line-height:1.6}
+.ec{display:block;margin-top:4px;color:#5a6577;font-size:11px;word-break:break-all}
+.foot{font-size:11px;color:#55607a;letter-spacing:1px;display:flex;justify-content:space-between}
 p{color:#9fb3c8;font-size:13px;margin:6px 0 16px}
-label{display:block;font-size:12px;color:#5ef2ff;margin:12px 0 4px}
-input{width:100%;box-sizing:border-box;background:#0f0f1a;border:1px solid #333;color:#fff;padding:9px;font:inherit}
-button{margin-top:18px;background:#fcee0a;color:#000;border:0;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
-#msg{margin-top:14px;font-size:13px;color:#ff5ea0;white-space:pre-wrap}
+label{display:block;font-size:12px;color:var(--c);margin:14px 0 5px;letter-spacing:1px}
+input{width:100%;background:#0f0f1a;border:1px solid #2a2a3d;color:#fff;padding:10px 12px;font:inherit;outline:0}
+input:focus{border-color:var(--c);box-shadow:0 0 0 2px #5ef2ff22}
+button{margin-top:16px;background:var(--y);color:#000;border:0;padding:10px 20px;font:inherit;font-weight:800;letter-spacing:1px;cursor:pointer;
+ clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);transition:filter .15s,transform .15s}
+button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+button.g{background:transparent;color:var(--c);border:1px solid #5ef2ff66;clip-path:none;margin-left:8px}
+#msg{margin-top:14px;font-size:13px;color:var(--r);white-space:pre-wrap}
 </style></head><body>
-<div class="box" id="ui"><h1>NIGHT CITY // UPLINK <small style="font-size:11px;color:#666">入口 v6</small></h1><p id="status">正在从 GitHub 拉取最新终端…</p></div>
+<div class="box" id="ui"><h1>NIGHT CITY // UPLINK<small>入口 v6</small></h1><div class="sub">NEURAL LINK · 夜之城终端</div><div id="status">正在接入夜之城…</div><div class="bar"><i></i></div><div class="foot"><span>LIFE-OS 2077</span><span id="clk"></span></div></div>
 <script>
 const CFG_KEY='nc2077.hub', CACHE_KEY='nc2077.hub.cache';
 const DEFAULT_REPO='zhai66666-max/life-os-2077', PATH='terminal/night-city-terminal.html';
-const ui=document.getElementById('ui');
+const ui=document.getElementById('ui');setInterval(()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toTimeString().slice(0,8)},1000);
 const getCfg=()=>{try{return JSON.parse(localStorage.getItem(CFG_KEY))||{}}catch(e){return{}}};
 const dec=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,'')),c=>c.charCodeAt(0)));
 
@@ -26,7 +51,7 @@ function boot(html,hub){
 }
 function form(err){
   const c=getCfg();
-  ui.innerHTML=`<h1>NIGHT CITY // UPLINK</h1>
+  ui.innerHTML=`<h1>NIGHT CITY // UPLINK<small>入口 v6</small></h1>
   <p>第一次在这台设备使用：填入对 life-os-2077 有 Contents: Read and write 权限的 GitHub 令牌（和终端云同步用同一个）。令牌只保存在这台设备的浏览器里；用完公共设备记得在终端里点「退出此设备」。</p>
   <label>仓库</label><input id="repo" value="${c.repo||DEFAULT_REPO}">
   <label>读写令牌（github_pat_…）</label><input id="tok" type="password" value="${c.token||''}">
@@ -45,10 +70,12 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
   const hasC=!!(cc&&cc.html);
   const st=t=>{const s=document.getElementById('status');if(s)s.innerHTML=t;};
   const useCache=why=>boot(cc.html,{repo:c.repo,token:c.token,sha:cc.sha,offline:true,why});
-  const fail=(why,err)=>{const m={net:'连不上 GitHub 接口（api.github.com）',slow:'下载太慢'}[why]||why;
+  const fail=(why,err)=>{const m={net:'暂时连不上 GitHub',slow:'下载太慢'}[why]||why;
     try{localStorage.setItem('nc2077.hub.err',JSON.stringify({t:new Date().toISOString(),why,err:String(err&&err.message||err||'')}))}catch(_){}
-    st('<b style="color:#ff5ea0">'+m+'</b><br><span style="font-size:12px">原因：'+String(err&&(err.name+' '+err.message)||err||'').replace(/</g,'&lt;')+'</span>'+
-      '<br><button id="rt" style="margin-top:12px">重试</button> '+(hasC?'<button id="uo" style="margin-top:12px;background:#333;color:#ddd">先打开本机旧版</button>':''));
+    ui.classList.add('err');const raw=String(err&&(err.name+' '+err.message)||err||'').replace(/</g,'&lt;');
+    const tip=/Abort|Failed to fetch|NetworkError|blocked/i.test(raw)?'这台设备连 GitHub 很慢或被拦住了。可以点重试；急用的话先打开本机旧版，数据不会丢。':'可以点重试，或先打开本机旧版。';
+    st('<span class="et">'+m+'</span><span class="ed">'+tip+'</span><span class="ec">'+raw+'</span>'+
+      '<br><button id="rt">重试</button>'+(hasC?'<button id="uo" class="g">先打开本机旧版</button>':''));
     document.getElementById('rt').onclick=()=>location.reload();const u=document.getElementById('uo');if(u)u.onclick=()=>useCache(why);};
   const tfetch=(u,h,ms)=>{const ac=new AbortController();const to=setTimeout(()=>ac.abort(),ms);return fetch(u,{headers:h,cache:'no-store',signal:ac.signal}).finally(()=>clearTimeout(to));};
   const auth={Authorization:'Bearer '+c.token};
@@ -83,7 +110,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
   /* 需要下载新版本 */
   let t0=Date.now(),done=false;
   const tick=setInterval(()=>{if(done)return;const s=Math.round((Date.now()-t0)/1000);
-    st('发现新版本，正在下载… '+s+' 秒'+(hasC&&s>=8?'<br><button id="useOld" style="margin-top:10px;background:#333;color:#ddd">网太慢，先打开旧版</button>':''));
+    st('发现新版本，正在下载 · '+s+' 秒'+(hasC&&s>=8?'<br><button id="useOld" class="g" style="margin-left:0">网太慢，先打开旧版</button>':''));
     const b=document.getElementById('useOld');if(b)b.onclick=()=>{done=true;clearInterval(tick);useCache('slow');};},1000);
   try{
     let html=null;

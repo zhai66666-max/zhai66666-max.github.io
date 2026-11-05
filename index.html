@@ -55,11 +55,11 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
   const bad=async r=>{let gm='';try{gm=(await r.json()).message||''}catch(_){}
     const rl=r.headers.get('x-ratelimit-remaining')==='0'||/rate limit/i.test(gm);
     if(rl){const rs=+r.headers.get('x-ratelimit-reset')||0;const at=rs?new Date(rs*1000).toLocaleTimeString().slice(0,5):'一小时内';
-      if(hasC){useCache('ratelimit');return;}form('GitHub 接口暂时限流（不是令牌坏了），'+at+' 自动恢复，到时刷新即可。');return;}
+      if(hasC){fail('GitHub 接口限流，'+at+' 恢复','rate limit');return;}form('GitHub 接口暂时限流（不是令牌坏了），'+at+' 自动恢复，到时刷新即可。');return;}
     const why=r.status===401?'令牌无效或已过期，需要在 GitHub 重新生成一个':(r.status===404?'找不到仓库，或令牌没有勾选这个仓库':'令牌没有这个仓库的 Contents 权限，或已被撤销');
     form('连接失败（'+r.status+'）：'+why+'。GitHub 原话：'+(gm||'无')+(hasC?'<br><button id="useCache" style="margin-top:8px">先用本机缓存打开</button>':''));
     const uc=document.getElementById('useCache');if(uc)uc.onclick=()=>useCache('auth');};
-  if(!navigator.onLine){if(hasC)useCache('offline');else st('网络不通，且本地还没有缓存版本。联网后刷新。');return;}
+  if(!navigator.onLine){if(hasC)fail('这台设备显示没联网','navigator.onLine=false');else st('网络不通，且本地还没有缓存版本。联网后刷新。');return;}
   let sha='';
   try{
     st('正在核对终端版本…');

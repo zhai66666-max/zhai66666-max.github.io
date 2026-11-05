@@ -63,7 +63,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
   let sha='',gzName='';
   /* v6（2026-11-05）：电脑连 api.github.com 常超时，版本号改从 github.io 加速节点的 nc/latest.json 取；
      钥匙在本机就完全不碰 api.github.com。钥匙可由 #k=… 一次性链接写入（不会发到服务器）。 */
-  try{const m=location.hash.match(/k=([A-Za-z0-9+/=_-]+)/);if(m){localStorage.setItem('nc2077.hub.k',decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname);}}catch(_){}
+  try{const m=location.hash.match(/k=([A-Za-z0-9+/=_%-]+)/);if(m){localStorage.setItem('nc2077.hub.k',decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname);}}catch(_){}
   const PB=location.host==='zhai66666-max.github.io'?'':'https://zhai66666-max.github.io';
   try{st('正在核对终端版本…');
     const r=await tfetch(PB+'/nc/latest.json?t='+Date.now(),{},8000);

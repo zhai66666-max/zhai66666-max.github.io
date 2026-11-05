@@ -11,7 +11,7 @@ input{width:100%;box-sizing:border-box;background:#0f0f1a;border:1px solid #333;
 button{margin-top:18px;background:#fcee0a;color:#000;border:0;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer}
 #msg{margin-top:14px;font-size:13px;color:#ff5ea0;white-space:pre-wrap}
 </style></head><body>
-<div class="box" id="ui"><h1>NIGHT CITY // UPLINK <small style="font-size:11px;color:#666">入口 v3</small></h1><p id="status">正在从 GitHub 拉取最新终端…</p></div>
+<div class="box" id="ui"><h1>NIGHT CITY // UPLINK <small style="font-size:11px;color:#666">入口 v4</small></h1><p id="status">正在从 GitHub 拉取最新终端…</p></div>
 <script>
 const CFG_KEY='nc2077.hub', CACHE_KEY='nc2077.hub.cache';
 const DEFAULT_REPO='zhai66666-max/life-os-2077', PATH='terminal/night-city-terminal.html';
@@ -60,13 +60,13 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
     form('连接失败（'+r.status+'）：'+why+'。GitHub 原话：'+(gm||'无')+(hasC?'<br><button id="useCache" style="margin-top:8px">先用本机缓存打开</button>':''));
     const uc=document.getElementById('useCache');if(uc)uc.onclick=()=>useCache('auth');};
   if(!navigator.onLine){if(hasC)fail('这台设备显示没联网','navigator.onLine=false');else st('网络不通，且本地还没有缓存版本。联网后刷新。');return;}
-  let sha='';
+  let sha='',gzName='';
   try{
     st('正在核对终端版本…');
     const dir=PATH.replace(/\/[^/]+$/,''),name=PATH.split('/').pop();
     const r=await tfetch(`https://api.github.com/repos/${c.repo}/contents/${dir}`,{...auth,Accept:'application/vnd.github+json'},12000);
     if(!r.ok){await bad(r);return;}
-    const e=(await r.json()).find(x=>x.name===name);sha=e&&e.sha||'';
+    const ls=await r.json();const e=ls.find(x=>x.name===name);sha=e&&e.sha||'';gzName=sha&&ls.some(x=>x.name==='nct-'+sha+'.gz')?'nct-'+sha+'.gz':'';
     if(sha&&hasC&&cc.sha===sha){boot(cc.html,{repo:c.repo,token:c.token,sha});return;}
   }catch(e){fail('net',e);return;}
   /* 需要下载新版本 */
@@ -75,10 +75,19 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
     st('发现新版本，正在下载… '+s+' 秒'+(hasC&&s>=8?'<br><button id="useOld" style="margin-top:10px;background:#333;color:#ddd">网太慢，先打开旧版</button>':''));
     const b=document.getElementById('useOld');if(b)b.onclick=()=>{done=true;clearInterval(tick);useCache('slow');};},1000);
   try{
-    const r=await tfetch(`https://api.github.com/repos/${c.repo}/contents/${PATH}`,{...auth,Accept:'application/vnd.github.raw'},60000);
+    let html=null;
+    /* 优先下载压缩包（约 240 KB，比原文件小 3 倍多）；浏览器不支持或失败再下原文件 */
+    if(gzName&&typeof DecompressionStream!=='undefined'){try{
+      const g=await tfetch(`https://api.github.com/repos/${c.repo}/contents/${PATH.replace(/[^/]+$/,gzName)}`,{...auth,Accept:'application/vnd.github.raw'},60000);
+      if(g.ok){html=await new Response(g.body.pipeThrough(new DecompressionStream('gzip'))).text();if(!/<html/i.test(html.slice(0,500)))html=null;}
+    }catch(e){html=null;}}
     if(done)return;
-    if(!r.ok){done=true;clearInterval(tick);await bad(r);return;}
-    const html=await r.text();if(done)return;done=true;clearInterval(tick);
+    if(html==null){
+      const r=await tfetch(`https://api.github.com/repos/${c.repo}/contents/${PATH}`,{...auth,Accept:'application/vnd.github.raw'},60000);
+      if(done)return;
+      if(!r.ok){done=true;clearInterval(tick);await bad(r);return;}
+      html=await r.text();}
+    if(done)return;done=true;clearInterval(tick);
     try{localStorage.setItem(CACHE_KEY,JSON.stringify({sha,html}))}catch(e){try{localStorage.removeItem(CACHE_KEY);localStorage.setItem(CACHE_KEY,JSON.stringify({sha,html}))}catch(_){}}
     boot(html,{repo:c.repo,token:c.token,sha});
   }catch(e){if(done)return;done=true;clearInterval(tick);fail('net',e);}

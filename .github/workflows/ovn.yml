@@ -19,5 +19,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          SYMS: QQQ
+          SYMS: QQQ,QQQM
           RUN_MIN: '58'

@@ -1,0 +1,23 @@
+name: ovn-relay
+on:
+  schedule:
+    - cron: '0 * * * 1-5'
+    - cron: '0 0 * * 6'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ovn
+  cancel-in-progress: true
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 62
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/ovn.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SYMS: QQQ
+          RUN_MIN: '58'

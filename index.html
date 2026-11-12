@@ -45,7 +45,17 @@ const getCfg=()=>{try{return JSON.parse(localStorage.getItem(CFG_KEY))||{}}catch
 const dec=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,'')),c=>c.charCodeAt(0)));
 
 function boot(html,hub){
-  const inject='<script>window.__NC_HUB='+JSON.stringify(hub).replace(/</g,'\\u003c')+';<\/script>';
+  /* 版本看门狗（2026-11-13）：跟终端 html 自身的版本无关，只比对「本页启动时注入的 sha」与线上指针。
+     指针一变就重载；重载后 __NC_HUB.sha 等于新指针，条件不再成立，所以只刷一次、不会互相刷。 */
+  const watchdog='(function(){var my=window.__NC_HUB&&window.__NC_HUB.sha;if(!my)return;'
+    +'var id=setInterval(function(){'
+    +'fetch("/nc/latest.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){'
+    +'if(j&&j.sha&&j.sha!==my){'
+    +'try{if(sessionStorage.getItem("nc2077.bootver")===j.sha){clearInterval(id);return;}'
+    +'sessionStorage.setItem("nc2077.bootver",j.sha);sessionStorage.setItem("nc-quiet","1");}catch(e){}'
+    +'clearInterval(id);location.reload();}'
+    +'}).catch(function(){});},30000);})();';
+  const inject='<script>window.__NC_HUB='+JSON.stringify(hub).replace(/</g,'\\u003c')+';'+watchdog+'<\/script>';
   html=html.replace(/<head([^>]*)>/i,m=>m+inject);
   document.open();document.write(html);document.close();
 }

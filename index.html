@@ -1,50 +1,62 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="夜之城"><meta name="theme-color" content="#07070d">
-<title>NIGHT CITY // 连接中</title>
+<title>NIGHT CITY // 连接中</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{--y:#fcee0a;--c:#5ef2ff;--r:#ff4d6d;--t:#e8f6ff;--d:#8a98ab}
+:root{--y:#fcee0a;--c:#00f0ff;--r:#ff003c;--brand:#ff5ea0;--t:#e8e8f0;--d:#8a98ab;--bg:#07070c;--panel:#0e0e16;--line:#22223a}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--t);
- font:15px/1.65 "JetBrains Mono",ui-monospace,Menlo,Consolas,"PingFang SC","Microsoft YaHei",monospace;
+ font:15px/1.65 "Share Tech Mono","JetBrains Mono",ui-monospace,Menlo,Consolas,"PingFang SC","Microsoft YaHei",monospace;
  background:radial-gradient(ellipse at 50% 35%,#16152a 0,#07070d 65%) fixed,#07070d}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 3px)}
 .box{position:relative;width:min(540px,92vw);padding:30px 30px 22px;background:#0b0b14e6;border:1px solid #fcee0a33;
  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));box-shadow:0 0 40px #fcee0a14 inset}
 .box:after{content:"";position:absolute;left:0;top:0;width:4px;height:100%;background:linear-gradient(var(--y),#fcee0a00)}
-h1{margin:0;font-size:20px;color:var(--y);letter-spacing:3px;font-weight:800;text-shadow:0 0 12px #fcee0a55}
+h1{margin:0;font-family:Orbitron,"Share Tech Mono",monospace;font-size:20px;color:var(--y);letter-spacing:3px;font-weight:800;text-shadow:0 0 12px #fcee0a55}
 h1 small{font-size:11px;letter-spacing:1px;color:#0b0b14;background:var(--c);padding:1px 6px;margin-left:8px;vertical-align:3px;font-weight:700;text-shadow:none}
-.sub{margin:4px 0 20px;font-size:11px;letter-spacing:2px;color:#5ef2ff99}
+.sub{margin:4px 0 20px;font-size:11px;letter-spacing:2px;color:#00f0ff99}
 #status{font-size:14px;color:var(--t);min-height:44px}
 #status:before{content:"▸ ";color:var(--c)}
 .bar{height:3px;background:#ffffff10;margin:16px 0 10px;overflow:hidden;position:relative}
 .bar i{position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,var(--c),var(--y));animation:run 1.2s linear infinite}
 @keyframes run{to{left:100%}}
 .box.err .bar i{animation:none;left:0;width:100%;background:var(--r)}
-.box.err{border-color:#ff4d6d55}.box.err:after{background:linear-gradient(var(--r),#ff4d6d00)}
+.box.err{border-color:#ff003c55}.box.err:after{background:linear-gradient(var(--r),#ff003c00)}
 .box.err #status:before{content:"✕ ";color:var(--r)}
 .et{font-weight:700;color:#ff8fa3;font-size:15px}
 .ed{display:block;margin-top:6px;color:var(--d);font-size:12px;line-height:1.6}
 .ec{display:block;margin-top:4px;color:#5a6577;font-size:11px;word-break:break-all}
 .foot{font-size:11px;color:#55607a;letter-spacing:1px;display:flex;justify-content:space-between}
+#steps{list-style:none;margin:14px 0 2px;padding:0;font-size:12.5px;letter-spacing:1px}
+#steps li{color:#55607a;padding:2.5px 0;transition:color .2s}
+#steps li:before{content:"·";display:inline-block;width:20px;color:#3a4356}
+#steps li.on{color:var(--t)}
+#steps li.on:before{content:"▸";color:var(--c);animation:blk 1s steps(1) infinite}
+#steps li.ok{color:#7d8ca3}
+#steps li.ok:before{content:"✓";color:#39ff88}
+#steps li.err{color:#ff8fa3}
+#steps li.err:before{content:"✕";color:var(--r)}
+@keyframes blk{50%{opacity:.25}}
 p{color:#9fb3c8;font-size:13px;margin:6px 0 16px}
 label{display:block;font-size:12px;color:var(--c);margin:14px 0 5px;letter-spacing:1px}
 input{width:100%;background:#0f0f1a;border:1px solid #2a2a3d;color:#fff;padding:10px 12px;font:inherit;outline:0}
-input:focus{border-color:var(--c);box-shadow:0 0 0 2px #5ef2ff22}
+input:focus{border-color:var(--c);box-shadow:0 0 0 2px #00f0ff22}
 button{margin-top:16px;background:var(--y);color:#000;border:0;padding:10px 20px;font:inherit;font-weight:800;letter-spacing:1px;cursor:pointer;
  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);transition:filter .15s,transform .15s}
 button:hover{filter:brightness(1.12);transform:translateY(-1px)}
-button.g{background:transparent;color:var(--c);border:1px solid #5ef2ff66;clip-path:none;margin-left:8px}
+button.g{background:transparent;color:var(--c);border:1px solid #00f0ff66;clip-path:none;margin-left:8px}
 #msg{margin-top:14px;font-size:13px;color:var(--r);white-space:pre-wrap}
 </style></head><body>
-<div class="box" id="ui"><h1>NIGHT CITY // UPLINK<small>入口 v6</small></h1><div class="sub">NEURAL LINK · 夜之城终端</div><div id="status">正在接入夜之城…</div><div class="bar"><i></i></div><div class="foot"><span>LIFE-OS 2077</span><span id="clk"></span></div></div>
+<div class="box" id="ui"><h1>NIGHT CITY // UPLINK<small>入口 v6</small></h1><div class="sub">NEURAL LINK · 夜之城终端</div><div id="status">正在接入夜之城…</div><ul id="steps"><li data-s="ver">核对终端版本</li><li data-s="dl">下载终端包</li><li data-s="dec">解密 / 校验完整性</li><li data-s="boot">注入启动</li></ul><div class="bar"><i></i></div><div class="foot"><span>LIFE-OS 2077</span><span id="clk"></span></div></div>
 <script>
 const CFG_KEY='nc2077.hub', CACHE_KEY='nc2077.hub.cache';
 const DEFAULT_REPO='zhai66666-max/life-os-2077', PATH='terminal/night-city-terminal.html';
 const ui=document.getElementById('ui');setInterval(()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toTimeString().slice(0,8)},1000);
 const getCfg=()=>{try{return JSON.parse(localStorage.getItem(CFG_KEY))||{}}catch(e){return{}}};
 const dec=b=>new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g,'')),c=>c.charCodeAt(0)));
+const step=(id,s)=>{const li=document.querySelector('#steps li[data-s="'+id+'"]');if(li)li.className=s||'';};
+const stepErr=()=>{const li=document.querySelector('#steps li.on');if(li)li.className='err';};
 
-function boot(html,hub){
+function boot(html,hub){step('boot','on');
   /* 版本看门狗（2026-11-13）：跟终端 html 自身的版本无关，只比对「本页启动时注入的 sha」与线上指针。
      指针一变就重载；重载后 __NC_HUB.sha 等于新指针，条件不再成立，所以只刷一次、不会互相刷。 */
   const watchdog='(function(){var my=window.__NC_HUB&&window.__NC_HUB.sha;if(!my)return;'
@@ -80,7 +92,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
   const hasC=!!(cc&&cc.html);
   const st=t=>{const s=document.getElementById('status');if(s)s.innerHTML=t;};
   const useCache=why=>boot(cc.html,{repo:c.repo,token:c.token,sha:cc.sha,offline:true,why});
-  const fail=(why,err)=>{const m={net:'暂时连不上 GitHub',slow:'下载太慢'}[why]||why;
+  const fail=(why,err)=>{stepErr();const m={net:'暂时连不上 GitHub',slow:'下载太慢'}[why]||why;
     try{localStorage.setItem('nc2077.hub.err',JSON.stringify({t:new Date().toISOString(),why,err:String(err&&err.message||err||'')}))}catch(_){}
     ui.classList.add('err');const raw=String(err&&(err.name+' '+err.message)||err||'').replace(/</g,'&lt;');
     const tip=/Abort|Failed to fetch|NetworkError|blocked/i.test(raw)?'这台设备连 GitHub 很慢或被拦住了。可以点重试；急用的话先打开本机旧版，数据不会丢。':'可以点重试，或先打开本机旧版。';
@@ -102,7 +114,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
      钥匙在本机就完全不碰 api.github.com。钥匙可由 #k=… 一次性链接写入（不会发到服务器）。 */
   try{const m=location.hash.match(/k=([A-Za-z0-9+/=_%-]+)/);if(m){localStorage.setItem('nc2077.hub.k',decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname);}}catch(_){}
   const PB=location.host==='zhai66666-max.github.io'?'':'https://zhai66666-max.github.io';
-  try{st('正在核对终端版本…');
+  try{step('ver','on');st('正在核对终端版本…');
     const r=await tfetch(PB+'/nc/latest.json?t='+Date.now(),{},8000);
     if(r.ok){sha=((await r.json()).sha)||'';}
   }catch(e){}
@@ -117,6 +129,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
     if(sha&&hasC&&cc.sha===sha){boot(cc.html,{repo:c.repo,token:c.token,sha});return;}
   }catch(e){if(!sha){fail('net',e);return;}}
   }
+  step('ver','ok');step('dl','on');
   /* 需要下载新版本 */
   let t0=Date.now(),done=false;
   const tick=setInterval(()=>{if(done)return;const s=Math.round((Date.now()-t0)/1000);
@@ -134,7 +147,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
           const key=await crypto.subtle.importKey('raw',Uint8Array.from(atob(k),x=>x.charCodeAt(0)),'AES-GCM',false,['decrypt']);
           const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b.slice(0,12)},key,b.slice(12));
           html=await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
-          if(!/<html/i.test(html.slice(0,500)))html=null;}}}}catch(e){html=null;}
+          if(!/<html/i.test(html.slice(0,500)))html=null;else step('dec','ok');}}}}catch(e){html=null;}
     if(done)return;
     if(html==null&&gzName&&typeof DecompressionStream!=='undefined'){try{
       const g=await tfetch(`https://api.github.com/repos/${c.repo}/contents/${PATH.replace(/[^/]+$/,gzName)}`,{...auth,Accept:'application/vnd.github.raw'},60000);
@@ -146,7 +159,7 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
       if(done)return;
       if(!r.ok){done=true;clearInterval(tick);await bad(r);return;}
       html=await r.text();}
-    if(done)return;done=true;clearInterval(tick);
+    step('dl','ok');step('dec','ok');if(done)return;done=true;clearInterval(tick);
     try{localStorage.setItem(CACHE_KEY,JSON.stringify({sha,html}))}catch(e){try{localStorage.removeItem(CACHE_KEY);localStorage.setItem(CACHE_KEY,JSON.stringify({sha,html}))}catch(_){}}
     boot(html,{repo:c.repo,token:c.token,sha});
   }catch(e){if(done)return;done=true;clearInterval(tick);fail('net',e);}

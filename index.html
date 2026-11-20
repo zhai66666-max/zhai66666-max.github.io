@@ -46,7 +46,7 @@ button:hover{filter:brightness(1.12);transform:translateY(-1px)}
 button.g{background:transparent;color:var(--c);border:1px solid #00f0ff66;clip-path:none;margin-left:8px}
 #msg{margin-top:14px;font-size:13px;color:var(--r);white-space:pre-wrap}
 </style></head><body>
-<div class="box" id="ui"><h1>NIGHT CITY // UPLINK<small>入口 v6</small></h1><div class="sub">NEURAL LINK · 夜之城终端</div><div id="status">正在接入夜之城…</div><ul id="steps"><li data-s="ver">核对终端版本</li><li data-s="dl">下载终端包</li><li data-s="dec">解密 / 校验完整性</li><li data-s="boot">注入启动</li></ul><div class="bar"><i></i></div><div class="foot"><span>LIFE-OS 2077</span><span id="clk"></span></div></div>
+<div class="box" id="ui"><h1>NIGHT CITY // UPLINK<small>入口 v7</small></h1><div class="sub">NEURAL LINK · 夜之城终端</div><div id="status">正在接入夜之城…</div><ul id="steps"><li data-s="ver">核对终端版本</li><li data-s="dl">下载终端包</li><li data-s="dec">解密 / 校验完整性</li><li data-s="boot">注入启动</li></ul><div class="bar"><i></i></div><div class="foot"><span>LIFE-OS 2077</span><span id="clk"></span></div></div>
 <script>
 const CFG_KEY='nc2077.hub', CACHE_KEY='nc2077.hub.cache';
 const DEFAULT_REPO='zhai66666-max/life-os-2077', PATH='terminal/night-city-terminal.html';
@@ -59,9 +59,9 @@ const stepErr=()=>{const li=document.querySelector('#steps li.on');if(li)li.clas
 function boot(html,hub){step('boot','on');
   /* 版本看门狗（2026-11-13）：跟终端 html 自身的版本无关，只比对「本页启动时注入的 sha」与线上指针。
      指针一变就重载；重载后 __NC_HUB.sha 等于新指针，条件不再成立，所以只刷一次、不会互相刷。 */
-  const watchdog='(function(){var my=window.__NC_HUB&&window.__NC_HUB.sha;if(!my)return;'
+  const watchdog='(function(){var H=window.__NC_HUB||{};var my=H.sha;if(!my||!H.repo||!H.token)return;'
     +'var id=setInterval(function(){'
-    +'fetch("/nc/latest.json?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){'
+    +'fetch("https://api.github.com/repos/"+H.repo+"/contents/terminal/nc-latest.json?t="+Date.now(),{headers:{Authorization:"Bearer "+H.token,Accept:"application/vnd.github.raw"},cache:"no-store"}).then(function(r){return r.ok?r.json():null}).then(function(j){'
     +'if(j&&j.sha&&j.sha!==my){'
     +'try{if(sessionStorage.getItem("nc2077.bootver")===j.sha){clearInterval(id);return;}'
     +'sessionStorage.setItem("nc2077.bootver",j.sha);sessionStorage.setItem("nc-quiet","1");}catch(e){}'
@@ -73,7 +73,7 @@ function boot(html,hub){step('boot','on');
 }
 function form(err){
   const c=getCfg();
-  ui.innerHTML=`<h1>NIGHT CITY // UPLINK<small>入口 v6</small></h1>
+  ui.innerHTML=`<h1>NIGHT CITY // UPLINK<small>入口 v7</small></h1>
   <p>第一次在这台设备使用：填入对 life-os-2077 有 Contents: Read and write 权限的 GitHub 令牌（和终端云同步用同一个）。令牌只保存在这台设备的浏览器里；用完公共设备记得在终端里点「退出此设备」。</p>
   <label>仓库</label><input id="repo" value="${c.repo||DEFAULT_REPO}">
   <label>读写令牌（github_pat_…）</label><input id="tok" type="password" value="${c.token||''}">
@@ -114,10 +114,16 @@ if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceW
      钥匙在本机就完全不碰 api.github.com。钥匙可由 #k=… 一次性链接写入（不会发到服务器）。 */
   try{const m=location.hash.match(/k=([A-Za-z0-9+/=_%-]+)/);if(m){localStorage.setItem('nc2077.hub.k',decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname);}}catch(_){}
   const PB=location.host==='zhai66666-max.github.io'?'':'https://zhai66666-max.github.io';
+  /* v7（2026-11-20）：版本指针改以私有仓库内 terminal/nc-latest.json 为准（与终端代码同仓库、发版同提交，原子一致）；
+     github.io 静态指针只作接口故障时的兜底。 */
   try{step('ver','on');st('正在核对终端版本…');
-    const r=await tfetch(PB+'/nc/latest.json?t='+Date.now(),{},8000);
+    const r=await tfetch(`https://api.github.com/repos/${c.repo}/contents/terminal/nc-latest.json?t=`+Date.now(),{...auth,Accept:'application/vnd.github.raw'},10000);
     if(r.ok){sha=((await r.json()).sha)||'';}
   }catch(e){}
+  if(!sha){try{
+    const r=await tfetch(PB+'/nc/latest.json?t='+Date.now(),{},8000);
+    if(r.ok){sha=((await r.json()).sha)||'';}
+  }catch(e){}}
   if(sha&&hasC&&cc.sha===sha){boot(cc.html,{repo:c.repo,token:c.token,sha});return;}
   if(!sha||!localStorage.getItem('nc2077.hub.k')){
   try{
